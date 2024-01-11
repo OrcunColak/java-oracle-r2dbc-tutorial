@@ -1,16 +1,16 @@
-package com.colak.oracle;
+package com.colak.r2dbctemplate;
 
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
-import io.r2dbc.spi.R2dbcException;
 import io.r2dbc.spi.Readable;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -18,20 +18,24 @@ public class R2dbcTemplate {
 
     ConnectionFactory connectionFactory;
 
-    public void getConnectionFactory() {
+    public void getConnectionFactory(String path) throws IOException {
+        R2dbcConfig r2dbcConfig = new R2dbcConfig();
+        r2dbcConfig.load(path);
+
         connectionFactory = ConnectionFactories
                 .get(ConnectionFactoryOptions.builder()
-                        .option(ConnectionFactoryOptions.DRIVER, "oracle")
-                        .option(ConnectionFactoryOptions.HOST, OracleConfig.getHost())
-                        .option(ConnectionFactoryOptions.PORT, OracleConfig.getPort())
-                        .option(ConnectionFactoryOptions.DATABASE, OracleConfig.getDatabase())
-                        .option(ConnectionFactoryOptions.USER, OracleConfig.getUser())
-                        .option(ConnectionFactoryOptions.PASSWORD, OracleConfig.getPassword())
+                        .option(ConnectionFactoryOptions.DRIVER, "pool")
+                        .option(ConnectionFactoryOptions.PROTOCOL, r2dbcConfig.getProtocol())
+                        .option(ConnectionFactoryOptions.HOST, r2dbcConfig.getHost())
+                        .option(ConnectionFactoryOptions.PORT, r2dbcConfig.getPort())
+                        .option(ConnectionFactoryOptions.DATABASE, r2dbcConfig.getDatabase())
+                        .option(ConnectionFactoryOptions.USER, r2dbcConfig.getUser())
+                        .option(ConnectionFactoryOptions.PASSWORD, r2dbcConfig.getPassword())
                         .build());
 
     }
 
-    public Long createTable(String sql) {
+    public Long executeSql(String sql) {
         return Flux.usingWhen(
                         // resourceSupplier
                         connectionFactory.create(),
@@ -43,14 +47,6 @@ public class R2dbcTemplate {
                         // asyncCleanup
                         Connection::close)
                 .flatMap(Result::getRowsUpdated)
-                .onErrorReturn(error -> {
-                    // Check if the error is ORA-00955 for creating a table that already
-                    // exists. If so, then ignore it.
-                    if (error instanceof R2dbcException r2dbcException) {
-                        return r2dbcException.getErrorCode() == 955;
-                    }
-                    return false;
-                }, 0L)
                 .blockLast();
     }
 

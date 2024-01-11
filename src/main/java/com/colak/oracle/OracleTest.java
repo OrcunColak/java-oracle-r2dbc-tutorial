@@ -1,15 +1,17 @@
 package com.colak.oracle;
 
+import com.colak.model.Customer;
+import com.colak.r2dbctemplate.R2dbcTemplate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Main {
+public class OracleTest {
 
     private static R2dbcTemplate r2dbcTemplate;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         r2dbcTemplate = new R2dbcTemplate();
-        r2dbcTemplate.getConnectionFactory();
+        r2dbcTemplate.getConnectionFactory("/oracle.properties");
 
         createTable();
         insertRows();
@@ -38,7 +40,7 @@ public class Main {
     }
 
     private static void createTable() {
-        Long result = r2dbcTemplate.createTable("""
+        Long result = r2dbcTemplate.executeSql("""
                 CREATE TABLE customers (
                 id NUMBER(20),
                 name VARCHAR2(20 BYTE),

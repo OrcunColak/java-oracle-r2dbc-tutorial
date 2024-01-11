@@ -38,12 +38,22 @@
             <version>1.4.12</version>
         </dependency>
 
+        <!--  R2DBC Pool -->
+        <!--  See https://github.com/r2dbc/r2dbc-pool/ -->
+        <dependency>
+            <groupId>io.r2dbc</groupId>
+            <artifactId>r2dbc-pool</artifactId>
+            <version>1.0.1.RELEASE</version>
+        </dependency>
+
+
         <!-- Oracle R2DBC Driver-->
         <dependency>
             <groupId>com.oracle.database.r2dbc</groupId>
             <artifactId>oracle-r2dbc</artifactId>
             <version>1.2.0</version>
         </dependency>
+
 
         <!-- Oracle JDBC Driver-->
 <!--        <dependency>-->
@@ -52,6 +62,14 @@
 <!--            <version>23.2.0.0</version>-->
 <!--            <type>pom</type>-->
 <!--        </dependency>-->
+
+        <!-- PostgreSQL R2DBC Driver-->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>r2dbc-postgresql</artifactId>
+            <version>1.0.4.RELEASE</version>
+        </dependency>
+
 
     </dependencies>
 
